@@ -1,3 +1,17 @@
+
+// Victor
+var course =["85-211","51-216","36-201","15-110", "51-421","GRAD!"];
+
+function nextCourse(c){
+  var index = course.indexOf(c);
+  console.log(index);
+  console.log(course[2]);
+  if (index == course.length -1) {
+    return course[index];
+  }
+  return course[index+1];
+}
+
 function GameManager(size, InputManager, Actuator, StorageManager) {
   this.size           = size; // Size of the grid
   this.inputManager   = new InputManager;
@@ -66,9 +80,10 @@ GameManager.prototype.addStartTiles = function () {
 };
 
 // Adds a tile in a random position
+// victor: 2 or 4 is the starter tile. any move will also put an extra starter tile, mostly 2
 GameManager.prototype.addRandomTile = function () {
   if (this.grid.cellsAvailable()) {
-    var value = Math.random() < 0.9 ? 2 : 4;
+    var value = Math.random() < 0.9 ? course[0] : course[1];
     var tile = new Tile(this.grid.randomAvailableCell(), value);
 
     this.grid.insertTile(tile);
@@ -154,7 +169,11 @@ GameManager.prototype.move = function (direction) {
 
         // Only one merger per row traversal?
         if (next && next.value === tile.value && !next.mergedFrom) {
-          var merged = new Tile(positions.next, tile.value * 2);
+          // victor: here is where you set the value of the next tile!
+          // need to setup an array of value so we know which one is the next up
+          // how do we know the game is over
+          //var merged = new Tile(positions.next, tile.value * 2);
+          var merged = new Tile(positions.next, nextCourse(tile.value));
           merged.mergedFrom = [tile, next];
 
           self.grid.insertTile(merged);
@@ -164,10 +183,12 @@ GameManager.prototype.move = function (direction) {
           tile.updatePosition(positions.next);
 
           // Update the score
-          self.score += merged.value;
+          // Victor
+          self.score += 1;
 
           // The mighty 2048 tile
-          if (merged.value === 2048) self.won = true;
+          // check the last score an the won!
+          if (merged.value === "GRAD!") self.won = true;
         } else {
           self.moveTile(tile, positions.farthest);
         }
